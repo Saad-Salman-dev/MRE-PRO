@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRE.PRO — Movie Recommendation Engine</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+    <link rel="stylesheet" href="src.css" />
+</head>
+
+<body>
+
+  <nav class="mre-nav">
+    <div class="mre-logo" onclick="showPage('home')">MRE.<span>PRO</span></div>
+    <div class="mre-nav-links">
+      <a class="active" onclick="showPage('home')">Home</a>
+      <a onclick="showPage('watchlist')">Watchlist <span id="wl-badge" style="background:#e53935;color:#fff;border-radius:999px;padding:1px 7px;font-size:10px;margin-left:2px;display:none">0</span></a>
+      <a onclick="showPage('browse')">Browse</a>
+      <a onclick="showPage('popular')">🔥 Popular</a>
+      <a onclick="showPage('stats')">📊 My Stats</a>
+      <a onclick="showPage('ds')">Data Structures <span class="mre-ds-badge"><i class="ti ti-cpu" style="font-size:10px"></i> Live</span></a>
+    </div>
+    <div class="mre-search-wrap">
+      <button class="mre-theme-btn" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
+      <div class="mre-search-bar">
+        <i class="ti ti-search" style="color:#555;font-size:15px"></i>
+        <input type="text" placeholder="Search movies..." id="search-input" />
+      </div>
+    </div>
+  </nav>
+
+  <div class="mre-page active" id="page-home">
+    <div class="mre-motd-hero" id="motd-hero">
+      <div class="mre-motd-bg" id="motd-bg"></div>
+      <div class="mre-motd-emoji-bg" id="motd-emoji-bg"></div>
+      <div class="mre-motd-content">
+        <div class="mre-motd-tag"><div class="mre-motd-dot"></div> Movie of the Day</div>
+        <div class="mre-motd-title" id="motd-title">Loading...</div>
+        <div class="mre-motd-meta" id="motd-meta"></div>
+        <div class="mre-motd-desc" id="motd-desc"></div>
+        <div class="mre-motd-btns">
+          <button class="mre-btn-primary" id="motd-wl-btn">+ Add to Watchlist</button>
+          <button class="mre-btn-secondary" id="motd-detail-btn">View Details</button>
+          <button class="mre-motd-refresh" onclick="pickMotd(true)">🎲 New Movie</button>
+        </div>
+      </div>
+    </div>
+    <div id="home-sections"></div>
+    <div class="mre-section" style="padding-top:0">
+      <div style="background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 32px 28px;">
+        <div style="font-size:32px">🧠</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:600;margin-bottom:4px">Smart Graph Recommendations</div>
+          <div style="font-size:13px;color:#666">Save movies to your watchlist — MRE.PRO's Graph algorithm finds what you'll love next!</div>
+        </div>
+        <button class="mre-btn-primary" onclick="showPage('watchlist')">Try it now</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mre-page" id="page-watchlist">
+    <div class="mre-section">
+      <div class="mre-section-header">
+        <span class="mre-section-title">My Watchlist <span style="font-size:12px;color:#555;font-weight:400">(Stack data structure)</span></span>
+        <span class="mre-see-all" onclick="clearWatchlist()">Clear all</span>
+      </div>
+      <div class="mre-stats">
+        <div class="mre-stat">
+          <div class="mre-stat-num" id="stat-total">0</div>
+          <div class="mre-stat-label">Movies saved</div>
+        </div>
+        <div class="mre-stat">
+          <div class="mre-stat-num" id="stat-genre">—</div>
+          <div class="mre-stat-label">Top genre</div>
+        </div>
+        <div class="mre-stat">
+          <div class="mre-stat-num" id="stat-rating">—</div>
+          <div class="mre-stat-label">Avg rating</div>
+        </div>
+      </div>
+      <div class="mre-watchlist-panel">
+        <div id="watchlist-items">
+          <div class="mre-empty"><i class="ti ti-bookmark"></i>No movies saved yet. Browse and add some!</div>
+        </div>
+      </div>
+      <div style="margin-top:20px">
+        <div class="mre-section-title" style="margin-bottom:14px">Recommended for you <span style="font-size:12px;color:#555;font-weight:400">(Graph algorithm)</span></div>
+        <div class="mre-cards" id="rec-grid">
+          <div class="mre-empty" style="grid-column:1/-1"><i class="ti ti-graph"></i>Add movies to your watchlist to get recommendations!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mre-page" id="page-browse">
+    <div class="mre-section">
+      <div class="mre-section-header"><span class="mre-section-title">Browse movies <span style="font-size:12px;color:#555;font-weight:400">(Tree structure)</span></span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="mre-genres" id="genre-pills"></div>
+        <select id="sortSelect" onchange="renderBrowse()" style="background:#1a1a1a;color:white;border:1px solid #333;padding:8px;border-radius:8px">
+          <option value="rating">Highest Rated</option>
+          <option value="year">Newest</option>
+          <option value="title">A-Z</option>
+        </select>
+      </div>
+      <div class="mre-cards" id="browse-grid"></div>
+    </div>
+  </div>
+
+  <div class="mre-page" id="page-popular">
+    <div class="mre-section">
+      <div class="mre-section-header">
+        <span class="mre-section-title">🔥 Most Popular Movies <span style="font-size:12px;color:#555;font-weight:400">— sorted by rating</span></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px" id="popular-grid"></div>
+      <div class="mre-section-header" style="margin-top:8px">
+        <span class="mre-section-title">⭐ Your Rated Movies <span style="font-size:12px;color:#555;font-weight:400">— movies you rated</span></span>
+      </div>
+      <div class="mre-cards" id="rated-grid">
+        <div class="mre-empty" style="grid-column:1/-1"><i class="ti ti-star"></i>Rate movies from their detail page!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mre-page" id="page-ds">
+    <div class="mre-section">
+      <div class="mre-section-header">
+        <span class="mre-section-title">⚡ Live Data Structures</span>
+        <span style="font-size:12px;color:#555">Used inside MRE.PRO</span>
+      </div>
+      <div class="mre-ds-tabs">
+        <div class="mre-ds-tab active" onclick="showDSTab('stack')">📚 Stack</div>
+        <div class="mre-ds-tab" onclick="showDSTab('queue')">🔁 Queue</div>
+        <div class="mre-ds-tab" onclick="showDSTab('graph')">🔗 Graph</div>
+        <div class="mre-ds-tab" onclick="showDSTab('tree')">🌳 Tree</div>
+      </div>
+      <div class="mre-ds-panel active" id="ds-stack">
+        <div class="mre-ds-box">
+          <h3>Stack — Watch History</h3>
+          <p>A Stack works like a pile of plates — you add (push) and remove (pop) from the TOP only.</p>
+          <div id="stack-visual" class="mre-stack-container">
+            <div style="color:#333;font-size:13px">Stack is empty — push a movie!</div>
+          </div>
+          <div style="font-size:11px;color:#555;margin-bottom:10px;text-align:center">↑ TOP of Stack</div>
+          <div class="mre-stack-actions">
+            <select id="stack-movie-select" style="flex:1;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;border-radius:8px;padding:8px 12px;font-size:13px;outline:none"></select>
+            <button class="mre-ds-btn primary" onclick="stackPush()"><i class="ti ti-arrow-up"></i> Push</button>
+            <button class="mre-ds-btn" onclick="stackPop()"><i class="ti ti-arrow-down"></i> Pop</button>
+            <button class="mre-ds-btn" onclick="stackPeek()"><i class="ti ti-eye"></i> Peek</button>
+          </div>
+          <div id="stack-msg" style="margin-top:10px;font-size:13px;color:#888;min-height:20px"></div>
+        </div>
+      </div>
+      <div class="mre-ds-panel" id="ds-queue">
+        <div class="mre-ds-box">
+          <h3>Queue — Suggestion Queue</h3>
+          <p>A Queue works like a line of people — First In, First Out (FIFO).</p>
+          <div class="mre-queue-label"><span style="color:#00bcd4">← FRONT (dequeue)</span><span>BACK (enqueue) →</span></div>
+          <div id="queue-visual" class="mre-queue-container">
+            <div style="color:#333;font-size:13px">Queue is empty — enqueue a movie!</div>
+          </div>
+          <div class="mre-stack-actions">
+            <select id="queue-movie-select" style="flex:1;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;border-radius:8px;padding:8px 12px;font-size:13px;outline:none"></select>
+            <button class="mre-ds-btn primary" style="background:#00bcd4;border-color:#00bcd4" onclick="queueEnqueue()"><i class="ti ti-arrow-right"></i> Enqueue</button>
+            <button class="mre-ds-btn" onclick="queueDequeue()"><i class="ti ti-arrow-left"></i> Dequeue</button>
+          </div>
+          <div id="queue-msg" style="margin-top:10px;font-size:13px;color:#888;min-height:20px"></div>
+        </div>
+      </div>
+      <div class="mre-ds-panel" id="ds-graph">
+        <div class="mre-ds-box">
+          <h3>Graph — Movie Connections</h3>
+          <p>A Graph connects nodes (movies) with edges (similarities).</p>
+          <div class="mre-graph-canvas-wrap"><canvas id="graphCanvas" height="320"></canvas></div>
+          <div class="mre-graph-legend">
+            <div class="mre-graph-legend-item"><div class="mre-graph-legend-dot" style="background:#e53935"></div> Selected movie</div>
+            <div class="mre-graph-legend-item"><div class="mre-graph-legend-dot" style="background:#f5a623"></div> Connected</div>
+            <div class="mre-graph-legend-item"><div class="mre-graph-legend-dot" style="background:#333"></div> Other movies</div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <span style="font-size:13px;color:#888">Click a movie to see connections:</span>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap" id="graph-movie-btns"></div>
+          <div id="graph-msg" style="margin-top:10px;font-size:13px;color:#888;min-height:20px"></div>
+        </div>
+      </div>
+      <div class="mre-ds-panel" id="ds-tree">
+        <div class="mre-ds-box">
+          <h3>Tree — Genre Classification</h3>
+          <p>A Tree organizes data in a hierarchy. Root is "All Movies", branches are genres, leaves are movies.</p>
+          <div class="mre-tree-wrap" id="tree-visual"></div>
+          <div id="tree-msg" style="margin-top:10px;font-size:13px;color:#888;min-height:20px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mre-page" id="page-stats">
+    <div class="mre-section">
+      <div class="mre-section-header">
+        <span class="mre-section-title">📊 Your Stats Dashboard</span>
+      </div>
+      <div class="mre-hours-box">
+        <div class="mre-hours-num" id="stats-hours">0</div>
+        <div class="mre-hours-label">hours spent watching movies</div>
+        <div class="mre-hours-sub" id="stats-hours-sub">Add movies to your watch history to track time!</div>
+      </div>
+      <div class="mre-stats-grid">
+        <div class="mre-stat-card">
+          <div class="mre-stat-card-icon">🎬</div>
+          <div class="mre-stat-card-num" id="stats-watched">0</div>
+          <div class="mre-stat-card-label">Movies watched</div>
+          <div class="mre-stat-card-sub" id="stats-watched-sub">Start watching to track!</div>
+        </div>
+        <div class="mre-stat-card">
+          <div class="mre-stat-card-icon">🔖</div>
+          <div class="mre-stat-card-num" id="stats-saved">0</div>
+          <div class="mre-stat-card-label">In watchlist</div>
+          <div class="mre-stat-card-sub" id="stats-saved-sub">Save movies you want to watch</div>
+        </div>
+        <div class="mre-stat-card">
+          <div class="mre-stat-card-icon">⭐</div>
+          <div class="mre-stat-card-num" id="stats-rated">0</div>
+          <div class="mre-stat-card-label">Movies rated</div>
+          <div class="mre-stat-card-sub" id="stats-avg-rating">Rate movies to see avg</div>
+        </div>
+        <div class="mre-stat-card">
+          <div class="mre-stat-card-icon">🎭</div>
+          <div class="mre-stat-card-num" id="stats-top-genre">—</div>
+          <div class="mre-stat-card-label">Favourite genre</div>
+          <div class="mre-stat-card-sub" id="stats-genre-count">Based on watchlist</div>
+        </div>
+      </div>
+      <div class="mre-chart-wrap">
+        <div class="mre-chart-title">🎭 Genre Breakdown</div>
+        <div class="mre-pie-wrap">
+          <canvas class="mre-pie-canvas" id="pie-canvas" width="160" height="160"></canvas>
+          <div class="mre-pie-legend" id="pie-legend"><div style="color:#555;font-size:13px">Add movies to see your genre breakdown!</div></div>
+        </div>
+      </div>
+      <div class="mre-chart-wrap">
+        <div class="mre-chart-title">⭐ Your Ratings Distribution</div>
+        <div class="mre-bar-wrap" id="rating-bars">
+          <div style="color:#555;font-size:13px">Rate some movies to see your distribution!</div>
+        </div>
+      </div>
+      <div class="mre-chart-wrap">
+        <div class="mre-chart-title">🏅 Achievements</div>
+        <div class="mre-achievement-grid" id="achievements-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mre-modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="mre-modal">
+      <button class="mre-modal-close" onclick="closeModalDirect()"><i class="ti ti-x"></i></button>
+      <img id="modal-poster-img" class="mre-modal-poster-img" alt="Movie poster" />
+      <div class="mre-modal-emoji" id="modal-emoji"></div>
+      <h2 id="modal-title"></h2>
+      <div class="mre-modal-meta" id="modal-meta"></div>
+      <p id="modal-desc"></p>
+      <div id="modal-stars" class="mre-star-rating" style="margin-bottom:12px"></div>
+      <div id="modal-trailer" style="margin-bottom:16px"></div>
+      <div class="mre-modal-actions">
+        <button class="mre-btn-primary" id="modal-wl-btn">+ Add to Watchlist</button>
+        <button class="mre-btn-secondary" id="modal-hist-btn">+ Watch History</button>
+      </div>
+      <div class="mre-similar-section">
+        <h4>🔗 Similar movies (Graph recommendations)</h4>
+        <div class="mre-similar-chips" id="modal-similar"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Made with ❤️ · <span>MRE.PRO</span> · 2026</footer>
+
+  <div class="mre-toast" id="toast"></div>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
